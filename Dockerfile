@@ -12,7 +12,6 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 
 # Add needed patches and scripts
-ADD unifi-video.patch /unifi-video.patch
 ADD run.sh /run.sh
 
 # Run all commands
@@ -27,12 +26,9 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14
   echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" > /etc/apt/sources.list.d/mongodb-org-3.4.list && \
   apt-get update && apt-get install -y mongodb-org-server
 
-# Get, install and patch unifi-video
-RUN wget -q -O unifi-video.deb https://dl.ubnt.com/firmwares/ufv/v${version}/unifi-video.Ubuntu16.04_amd64.v${version}.deb && \
-  dpkg -i unifi-video.deb && \
-  patch -N /usr/sbin/unifi-video /unifi-video.patch && \
-  rm /unifi-video.deb && \
-  rm /unifi-video.patch && \
+RUN sudo wget -O - http://www.ubnt.com/downloads/unifi-video/apt-3.x/unifi-video.gpg.key | sudo apt-key add -; platform=`lsb_release -c | awk '{print $2}'` ; sudo sh -c "echo \"deb [arch=amd64] http://www.ubnt.com/downloads/unifi-video/apt-3.x $platform ubiquiti\" > /etc/apt/sources.list.d/unifi-video.list" && \
+  sudo apt-get update -y && sudo apt-get upgrade -y  && \
+  apt-get install -y unifi-video && \
   chmod 755 /run.sh
 
 # Configuration and database volume

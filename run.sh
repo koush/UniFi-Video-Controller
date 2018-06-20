@@ -1,12 +1,16 @@
 #!/bin/bash
 set -e
 
+apt-get install -y unifi-video
+sed -i 's/ulimit -H -c 200//g' /usr/sbin/unifi-video
+echo "unifi-video installed"
+
 # Options fed into unifi-video script
 unifi_video_opts=""
 
 # Graceful shutdown, used by trapping SIGTERM
 function graceful_shutdown {
-  echo -n "Stopping unifi-video... " 
+  echo -n "Stopping unifi-video... "
   if /usr/sbin/unifi-video --nodetach stop; then
     echo "done."
     exit 0
